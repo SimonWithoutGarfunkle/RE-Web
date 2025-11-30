@@ -14,18 +14,18 @@ class LoginPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Login', style: textTheme.headlineLarge),
+              Text('Se connecter', style: textTheme.headlineLarge),
               const SizedBox(height: 12),
-              Text('Manage your RE account. UI only.', style: textTheme.bodyLarge),
+              Text('Gère ton compte RE.', style: textTheme.bodyLarge),
               const SizedBox(height: 24),
               const _LoginForm(),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Text('New here?', style: textTheme.bodyMedium),
+                  Text('Nouveau?', style: textTheme.bodyMedium),
                   TextButton(
                     onPressed: () => Navigator.pushNamed(context, '/subscribe'),
-                    child: const Text('Create an account'),
+                    child: const Text('Crée ton compte'),
                   ),
                 ],
               ),
@@ -59,9 +59,9 @@ class _LoginFormState extends State<_LoginForm> {
           ),
           const SizedBox(height: 12),
           TextFormField(
-            decoration: const InputDecoration(labelText: 'Password'),
+            decoration: const InputDecoration(labelText: 'Mot de passe'),
             obscureText: true,
-            validator: (v) => (v == null || v.length < 6) ? 'Min 6 chars' : null,
+            validator: (v) => (v == null || v.length < 8) ? 'Minimum 8 caractères' : null,
           ),
           const SizedBox(height: 20),
           Align(
@@ -74,7 +74,7 @@ class _LoginFormState extends State<_LoginForm> {
                   );
                 }
               },
-              child: const Text('Login'),
+              child: const Text('Se connecter'),
             ),
           ),
         ],

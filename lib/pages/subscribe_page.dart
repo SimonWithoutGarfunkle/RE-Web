@@ -14,18 +14,18 @@ class SubscribePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Create Account', style: textTheme.headlineLarge),
+              Text('Inscription', style: textTheme.headlineLarge),
               const SizedBox(height: 12),
-              Text('Subscribe to manage your RE account. UI only.', style: textTheme.bodyLarge),
+              Text('Inscris toi et découvre l\'application RE.', style: textTheme.bodyLarge),
               const SizedBox(height: 24),
               const _SubscribeForm(),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Text('Already have an account?', style: textTheme.bodyMedium),
+                  Text('Déjà un compte?', style: textTheme.bodyMedium),
                   TextButton(
                     onPressed: () => Navigator.pushNamed(context, '/login'),
-                    child: const Text('Login'),
+                    child: const Text('Se connecter'),
                   ),
                 ],
               ),
@@ -55,19 +55,19 @@ class _SubscribeFormState extends State<_SubscribeForm> {
         children: [
           TextFormField(
             decoration: const InputDecoration(labelText: 'Email'),
-            validator: (v) => (v == null || !v.contains('@')) ? 'Invalid email' : null,
+            validator: (v) => (v == null || !v.contains('@')) ? 'Email invalide' : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
-            decoration: const InputDecoration(labelText: 'Password'),
+            decoration: const InputDecoration(labelText: 'Mot de passe'),
             obscureText: true,
-            validator: (v) => (v == null || v.length < 6) ? 'Min 6 chars' : null,
+            validator: (v) => (v == null || v.length < 8) ? 'Minimum 8 caractères' : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
-            decoration: const InputDecoration(labelText: 'Confirm password'),
+            decoration: const InputDecoration(labelText: 'Confirmer le mot de passe'),
             obscureText: true,
-            validator: (v) => (v == null || v.length < 6) ? 'Min 6 chars' : null,
+            validator: (v) => (v == null || v.length < 8) ? 'Minimum 8 caractères' : null,
           ),
           const SizedBox(height: 20),
           Align(
@@ -76,11 +76,11 @@ class _SubscribeFormState extends State<_SubscribeForm> {
               onPressed: () {
                 if (_formKey.currentState?.validate() ?? false) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Account not created (UI only)')),
+                    const SnackBar(content: Text('Compte non créé')),
                   );
                 }
               },
-              child: const Text('Create account'),
+              child: const Text('S\'inscrire'),
             ),
           ),
         ],

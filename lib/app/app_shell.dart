@@ -11,18 +11,28 @@ class AppShell extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Logo à gauche du titre
-            Image.network(
-              '/logo_re_detour_strict.png',
-              height: 46,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(width: 8),
-            const Text('RE'),
-          ],
+        title: InkWell(
+          mouseCursor: SystemMouseCursors.click,
+          splashFactory: InkSplash.splashFactory,
+          borderRadius: BorderRadius.circular(6),
+          onTap: () {
+            if (ModalRoute.of(context)?.settings.name != '/') {
+              Navigator.of(context).pushNamed('/');
+            }
+          },
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Logo à gauche du titre
+              Image.network(
+                '/logo_re_detour_strict.png',
+                height: 46,
+                fit: BoxFit.contain,
+              ),
+              const SizedBox(width: 8),
+              const Text('RE'),
+            ],
+          ),
         ),
         elevation: 0,
         // Neon gradient sheen across the app bar for a more vibrant look
@@ -65,7 +75,20 @@ class AppShell extends StatelessWidget {
         ),
       ),
       endDrawer: const _NavDrawer(),
-      body: child,
+      // Center horizontally only; keep content aligned to the top vertically
+      // to avoid vertical centering on short pages.
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          // Adjust maxWidth to control how wide the content column can grow on desktop
+          constraints: const BoxConstraints(maxWidth: 840),
+          // Keep a small horizontal padding so content doesn't touch the edges on mobile
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: child,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -115,7 +138,7 @@ class _NavDrawer extends StatelessWidget {
                       ],
                     ),
                   ),
-                  _NavTile(label: 'Accueil', route: '/', textStyle: textStyle),
+                  _NavTile(label: 'Présentation', route: '/', textStyle: textStyle),
                   _NavTile(label: 'Autheurs', route: '/authors', textStyle: textStyle),
                   _NavTile(label: 'Contact', route: '/contact', textStyle: textStyle),
                   const SizedBox(height: 8),
