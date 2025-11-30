@@ -1,12 +1,61 @@
 import 'package:flutter/material.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends StatefulWidget {
   const AppShell({super.key, required this.child});
 
   final Widget child;
 
   @override
+  State<AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<AppShell> {
+  ScrollController? _primaryScrollController;
+  bool _isAtBottom = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _attachToPrimaryScrollController();
+  }
+
+  void _attachToPrimaryScrollController() {
+    final controller = PrimaryScrollController.of(context);
+    if (_primaryScrollController == controller) return;
+    if (_primaryScrollController != null) {
+      _primaryScrollController!.removeListener(_onScroll);
+    }
+    _primaryScrollController = controller;
+    _primaryScrollController?.addListener(_onScroll);
+    _computeIsAtBottom();
+  }
+
+  void _onScroll() => _computeIsAtBottom();
+
+  void _computeIsAtBottom() {
+    final c = _primaryScrollController;
+    bool atBottom = false;
+    if (c != null && c.hasClients) {
+      final pos = c.position;
+      atBottom = pos.pixels >= pos.maxScrollExtent;
+    } else {
+      // Pas de contrôleur => page non scrollable, on considère qu'on est en bas
+      atBottom = true;
+    }
+    if (atBottom != _isAtBottom) {
+      setState(() => _isAtBottom = atBottom);
+    }
+  }
+
+  @override
+  void dispose() {
+    _primaryScrollController?.removeListener(_onScroll);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.sizeOf(context).width < 560;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
@@ -85,10 +134,14 @@ class AppShell extends StatelessWidget {
           // Keep a small horizontal padding so content doesn't touch the edges on mobile
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: child,
+            child: widget.child,
           ),
         ),
       ),
+      // Footer:
+      // - Desktop/Tablette: affiché en permanence (pinned) via bottomNavigationBar
+      // - Mobile (<560px): affiché uniquement quand on est en bas de page
+      bottomNavigationBar: isMobile ? (_isAtBottom ? _FooterBar() : null) : _FooterBar(),
     );
   }
 }
@@ -164,6 +217,156 @@ class _NavDrawer extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FooterBar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colors.primary.withValues(alpha: 0.12),
+            colors.secondary.withValues(alpha: 0.12),
+          ],
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Ligne de séparation en dégradé (comme en bas de l'app bar)
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  colors.secondary.withValues(alpha: 0.6),
+                  colors.primary.withValues(alpha: 0.6),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            child: Align(
+              alignment: Alignment.center,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 840),
+                child: _FooterContent(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FooterContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    Widget colTitle(String text) => Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(text, style: theme.textTheme.titleMedium?.copyWith(color: colors.primary)),
+        );
+
+    TextStyle? linkStyle = theme.textTheme.bodyMedium;
+
+    Widget link(String label, String route) => InkWell(
+          borderRadius: BorderRadius.circular(6),
+          mouseCursor: SystemMouseCursors.click,
+          onTap: () {
+            if (ModalRoute.of(context)?.settings.name != route) {
+              Navigator.of(context).pushNamed(route);
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.chevron_right, size: 18, color: colors.secondary),
+                const SizedBox(width: 6),
+                Text(label, style: linkStyle),
+              ],
+            ),
+          ),
+        );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 560;
+        final children = <Widget>[
+          // Colonne 1 — Fait avec coeur en 2025
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('Fait avec', style: theme.textTheme.bodyMedium),
+                  const SizedBox(width: 6),
+                  Icon(Icons.favorite, color: colors.primary, size: 18),
+                  const SizedBox(width: 6),
+                  Text('en 2025', style: theme.textTheme.bodyMedium),
+                ],
+              ),
+            ],
+          ),
+          // Colonne 2 — Navigation principale
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              colTitle('Plan'),
+              link('Présentation', '/'),
+              link('Auteurs', '/authors'),
+              link('Contact', '/contact'),
+            ],
+          ),
+          // Colonne 3 — Légal
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              colTitle('Légal'),
+              link('Mentions légales', '/mentions'),
+              link("Conditions d'utilisation", '/conditions'),
+            ],
+          ),
+        ];
+
+        if (isNarrow) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ...children.map((w) => Padding(padding: const EdgeInsets.only(bottom: 16), child: w)),
+            ],
+          );
+        }
+
+        return Row(
+          // Centre verticalement les colonnes afin que la 1ère colonne soit
+          // alignée au milieu de la hauteur du footer en affichage large.
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(child: children[0]),
+            const SizedBox(width: 24),
+            Expanded(child: children[1]),
+            const SizedBox(width: 24),
+            Expanded(child: children[2]),
+          ],
+        );
+      },
     );
   }
 }

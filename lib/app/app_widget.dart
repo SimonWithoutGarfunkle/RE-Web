@@ -5,6 +5,8 @@ import 'package:re_web/pages/contact_page.dart';
 import 'package:re_web/pages/home_page.dart';
 import 'package:re_web/pages/login_page.dart';
 import 'package:re_web/pages/subscribe_page.dart';
+import 'package:re_web/pages/mentions_legales_page.dart';
+import 'package:re_web/pages/conditions_utilisation_page.dart';
 import 'package:re_web/theme/app_theme.dart';
 
 class AppWidget extends StatelessWidget {
@@ -23,6 +25,8 @@ class AppWidget extends StatelessWidget {
         '/contact': (context) => const AppShell(child: ContactPage()),
         '/login': (context) => const AppShell(child: LoginPage()),
         '/subscribe': (context) => const AppShell(child: SubscribePage()),
+        '/mentions': (context) => const AppShell(child: MentionsLegalesPage()),
+        '/conditions': (context) => const AppShell(child: ConditionsUtilisationPage()),
       },
     );
   }
