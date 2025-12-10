@@ -3,7 +3,7 @@
 Ce dépôt contient le **site web vitrine** du projet **RE**.  
 Il ne s’agit **pas** de la version web de l’application mobile, mais d’un site de présentation destiné à expliquer le concept, l’univers et les fonctionnalités du projet avant inscription.
 
-Le site propose également quelques fonctionnalités simples liées au compte RE (accès, gestion basique du compte), sans vocation à reproduire l’expérience de l’application mobile.
+Le site propose également quelques fonctionnalités simples liées au compte RE (gestion basique du compte), sans vocation à reproduire l’expérience de l’application mobile.
 
 ---
 
